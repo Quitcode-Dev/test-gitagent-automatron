@@ -5,6 +5,7 @@ import './index.css'
 import App from './App.tsx'
 import AuthLayout from './app/(auth)/layout.tsx'
 import LoginPage from './app/(auth)/login/page.tsx'
+import RegisterPage from './app/(auth)/register/page.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -16,6 +17,14 @@ createRoot(document.getElementById('root')!).render(
           element={
             <AuthLayout>
               <LoginPage />
+            </AuthLayout>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <AuthLayout>
+              <RegisterPage />
             </AuthLayout>
           }
         />

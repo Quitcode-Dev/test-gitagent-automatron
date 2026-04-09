@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -26,6 +26,8 @@ type LoginFormValues = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const registered = (location.state as { registered?: boolean } | null)?.registered === true
   const [serverError, setServerError] = useState<string | null>(null)
 
   const {
@@ -61,6 +63,11 @@ export default function LoginPage() {
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <CardContent className="space-y-4">
+          {registered && (
+            <p role="status" className="text-sm text-green-600">
+              Account created! You can now sign in.
+            </p>
+          )}
           {serverError && (
             <p role="alert" className="text-sm text-destructive">
               {serverError}
