@@ -12,6 +12,7 @@ import DashboardPage from './app/(portal)/dashboard/page.tsx'
 import OrdersPage from './app/(portal)/orders/page.tsx'
 import InvoicesPage from './app/(portal)/invoices/page.tsx'
 import SuppliersPage from './app/(portal)/suppliers/page.tsx'
+import SupplierDetailPage from './app/(portal)/suppliers/[id]/page.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -40,6 +41,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/invoices" element={<InvoicesPage />} />
             <Route path="/suppliers" element={<SuppliersPage />} />
+            <Route path="/suppliers/:id" element={<SupplierDetailPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
