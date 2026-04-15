@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { useSession } from 'next-auth/react'
 import type { Supplier } from '@prisma/client'
 import type { ComponentProps } from 'react'
 
@@ -13,6 +14,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { SupplierForm } from '@/components/forms/SupplierForm'
+import { SupplierStatusActions } from '@/components/shared/SupplierStatusActions'
 import { SUPPLIER_STATUS_COLORS, SUPPLIER_STATUS_LABELS } from '@/lib/constants'
 import { formatDate } from '@/lib/formatters'
 
@@ -20,6 +22,7 @@ type BadgeVariant = ComponentProps<typeof Badge>['variant']
 
 export default function SupplierDetailPage() {
   const { id } = useParams<{ id: string }>()
+  const { data: session } = useSession()
   const [supplier, setSupplier] = useState<Supplier | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -68,9 +71,14 @@ export default function SupplierDetailPage() {
             {formatDate(new Date(supplier.updatedAt))}
           </p>
         </div>
-        <Button asChild variant="outline" size="sm">
-          <Link to="/suppliers">Back to suppliers</Link>
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link to="/suppliers">Back to suppliers</Link>
+          </Button>
+          {session?.user?.role === 'ADMIN' && (
+            <SupplierStatusActions supplier={supplier} onStatusChange={setSupplier} />
+          )}
+        </div>
       </div>
 
       <Card>
