@@ -1,19 +1,9 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, ShoppingCart, FileText, Building2 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-
-const navItems = [
-  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/orders', label: 'Orders', icon: ShoppingCart },
-  { to: '/invoices', label: 'Invoices', icon: FileText },
-]
-
-const adminNavItems = [
-  { to: '/suppliers', label: 'Suppliers', icon: Building2 },
-]
+import { navItems } from '@/lib/navigation'
 
 interface SidebarNavProps {
   onNavigate?: () => void
@@ -21,14 +11,20 @@ interface SidebarNavProps {
 
 export function SidebarNav({ onNavigate }: SidebarNavProps) {
   const { data: session } = useSession()
-  const isAdmin = session?.user?.role === 'ADMIN'
+  const role = session?.user?.role
+  const supplierId = session?.user?.supplierId
 
-  const allItems = isAdmin ? [...navItems, ...adminNavItems] : navItems
+  const visibleItems = navItems
+    .filter(item => !role || item.roles.includes(role))
+    .map(item => ({
+      ...item,
+      href: item.href.replace('[myId]', supplierId ?? ''),
+    }))
 
   return (
     <nav className="flex flex-col gap-1 p-4">
-      {allItems.map(({ to, label, icon: Icon }) => (
-        <NavLink key={to} to={to} onClick={onNavigate}>
+      {visibleItems.map(({ href, label, icon: Icon }) => (
+        <NavLink key={href} to={href} onClick={onNavigate}>
           {({ isActive }) => (
             <Button
               variant="ghost"
