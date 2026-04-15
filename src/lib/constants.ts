@@ -39,7 +39,7 @@ export const SUPPLIER_STATUS_LABELS: Record<SupplierStatus, string> = {
 };
 
 export const SUPPLIER_STATUS_COLORS: Record<SupplierStatus, string> = {
-  PENDING: "secondary",
+  PENDING: "warning",
   APPROVED: "success",
   REJECTED: "destructive",
 };
