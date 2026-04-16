@@ -139,45 +139,55 @@ export async function PUT(
   }
 
   if (items && existingOrder.status !== OrderStatus.DRAFT) {
-    return new Response(JSON.stringify({ error: 'Order items can only be updated while status is DRAFT.' }), {
+    return new Response(JSON.stringify({ error: 'Order items can only be updated while status is draft.' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     })
   }
 
-  const updatedOrder = await prisma.$transaction(async (tx) => {
-    if (items) {
-      await tx.orderItem.deleteMany({ where: { orderId: existingOrder.id } })
-      await tx.orderItem.createMany({
-        data: items.map((item) => ({
-          orderId: existingOrder.id,
-          description: item.description,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-        })),
+  try {
+    const updatedOrder = await prisma.$transaction(async (tx) => {
+      if (items) {
+        await tx.orderItem.deleteMany({ where: { orderId: existingOrder.id } })
+        await tx.orderItem.createMany({
+          data: items.map((item) => ({
+            orderId: existingOrder.id,
+            description: item.description,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+          })),
+        })
+      }
+
+      return tx.order.update({
+        where: { id: existingOrder.id },
+        data: {
+          ...(status ? { status } : {}),
+          ...(items
+            ? {
+                totalAmount: items.reduce(
+                  (total, item) => total + item.quantity * item.unitPrice,
+                  0,
+                ),
+              }
+            : {}),
+        },
+        include: {
+          items: true,
+          supplier: true,
+          invoices: true,
+        },
       })
-    }
-
-    const totalAmount = items
-      ? items.reduce((total, item) => total + item.quantity * item.unitPrice, 0)
-      : existingOrder.items.reduce((total, item) => total + item.quantity * Number(item.unitPrice), 0)
-
-    return tx.order.update({
-      where: { id: existingOrder.id },
-      data: {
-        ...(status ? { status } : {}),
-        ...(items ? { totalAmount } : {}),
-      },
-      include: {
-        items: true,
-        supplier: true,
-        invoices: true,
-      },
     })
-  })
 
-  return new Response(JSON.stringify(updatedOrder), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' },
-  })
+    return new Response(JSON.stringify(updatedOrder), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  } catch {
+    return new Response(JSON.stringify({ error: 'Failed to update order.' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
 }

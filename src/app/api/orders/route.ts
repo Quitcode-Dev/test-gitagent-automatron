@@ -1,4 +1,5 @@
-import { OrderStatus } from '@prisma/client'
+import { OrderStatus, Prisma } from '@prisma/client'
+import { randomUUID } from 'crypto'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth-utils'
@@ -16,8 +17,19 @@ const createOrderSchema = z.object({
     .min(1, 'At least one order item is required'),
 })
 
+const MAX_ORDER_NUMBER_GENERATION_ATTEMPTS = 5
+
 function generateOrderNumber(): string {
-  return `ORD-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
+  return `ORD-${randomUUID().split('-')[0]!.toUpperCase()}`
+}
+
+function isOrderNumberConflict(error: unknown): boolean {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === 'P2002' &&
+    Array.isArray(error.meta?.target) &&
+    error.meta.target.includes('orderNumber')
+  )
 }
 
 export async function GET(request: Request): Promise<Response> {
@@ -124,31 +136,56 @@ export async function POST(request: Request): Promise<Response> {
     0,
   )
 
-  const order = await prisma.$transaction(async (tx) =>
-    tx.order.create({
-      data: {
-        orderNumber: generateOrderNumber(),
-        supplierId,
-        status: OrderStatus.DRAFT,
-        totalAmount,
-        items: {
-          create: items,
-        },
-      },
-      include: {
-        items: true,
-        supplier: {
-          select: {
-            id: true,
-            companyName: true,
+  for (let attempt = 0; attempt < MAX_ORDER_NUMBER_GENERATION_ATTEMPTS; attempt += 1) {
+    try {
+      const order = await prisma.$transaction(async (tx) =>
+        tx.order.create({
+          data: {
+            orderNumber: generateOrderNumber(),
+            supplierId,
+            status: OrderStatus.DRAFT,
+            totalAmount,
+            items: {
+              create: items,
+            },
           },
-        },
-      },
-    }),
-  )
+          include: {
+            items: true,
+            supplier: {
+              select: {
+                id: true,
+                companyName: true,
+              },
+            },
+          },
+        }),
+      )
 
-  return new Response(JSON.stringify(order), {
-    status: 201,
-    headers: { 'Content-Type': 'application/json' },
-  })
+      return new Response(JSON.stringify(order), {
+        status: 201,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    } catch (error) {
+      if (!isOrderNumberConflict(error)) {
+        return new Response(JSON.stringify({ error: 'Failed to create order.' }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      }
+
+      if (attempt === MAX_ORDER_NUMBER_GENERATION_ATTEMPTS - 1) {
+        break
+      }
+    }
+  }
+
+  return new Response(
+    JSON.stringify({
+      error: 'Unable to generate unique order number after multiple attempts.',
+    }),
+    {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    },
+  )
 }
