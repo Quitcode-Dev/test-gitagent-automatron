@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import type { OrderStatus, Role } from '@prisma/client'
 
 import { Button } from '@/components/ui/button'
+import { ORDER_STATUS_LABELS } from '@/lib/constants'
 import { useToast } from '@/lib/use-toast'
 
 interface OrderStatusActionsProps {
@@ -73,7 +74,7 @@ export function OrderStatusActions({ orderId, status, role, onStatusUpdated }: O
 
       toast({
         title: 'Order updated',
-        description: `Order status changed to ${nextStatus}.`,
+        description: `Order status changed to ${ORDER_STATUS_LABELS[nextStatus]}.`,
       })
       onStatusUpdated?.()
     } catch {

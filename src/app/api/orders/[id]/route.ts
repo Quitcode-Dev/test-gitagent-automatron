@@ -143,11 +143,14 @@ export async function PUT(
   if (status && status !== existingOrder.status) {
     const allowedTransitions = getUpdatableStatusesByCurrent(user.role)[existingOrder.status]
     if (!allowedTransitions.includes(status)) {
+      const allowedTransitionsLabel = allowedTransitions.length > 0 ? allowedTransitions.join(', ') : 'none'
       return new Response(
-        JSON.stringify({ error: 'Invalid status transition for current role.' }),
+        JSON.stringify({
+          error: `Invalid status transition from ${existingOrder.status} to ${status} for current role. Allowed transitions: ${allowedTransitionsLabel}.`,
+        }),
         {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
         },
       )
     }
