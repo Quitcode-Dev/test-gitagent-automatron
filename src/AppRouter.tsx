@@ -33,7 +33,9 @@ const routes = [
 
 export default function AppRouter() {
   const pathname = usePathname()
-  const route = routes.find((candidate) => matchRoute(candidate.path, pathname))
+  const route =
+    routes.find((candidate) => !candidate.path.includes(':') && candidate.path === pathname) ??
+    routes.find((candidate) => candidate.path.includes(':') && matchRoute(candidate.path, pathname))
 
   if (!route) {
     return <App />
