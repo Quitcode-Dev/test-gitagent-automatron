@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react'
 import type { OrderStatus, Role } from '@prisma/client'
-import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/lib/use-toast'
@@ -11,6 +10,7 @@ interface OrderStatusActionsProps {
   orderId: string
   status: OrderStatus
   role?: Role
+  onStatusUpdated?: () => void
 }
 
 interface StatusAction {
@@ -19,8 +19,7 @@ interface StatusAction {
   variant?: 'default' | 'outline' | 'destructive'
 }
 
-export function OrderStatusActions({ orderId, status, role }: OrderStatusActionsProps) {
-  const navigate = useNavigate()
+export function OrderStatusActions({ orderId, status, role, onStatusUpdated }: OrderStatusActionsProps) {
   const { toast } = useToast()
   const [submittingStatus, setSubmittingStatus] = useState<OrderStatus | null>(null)
 
@@ -76,7 +75,7 @@ export function OrderStatusActions({ orderId, status, role }: OrderStatusActions
         title: 'Order updated',
         description: `Order status changed to ${nextStatus}.`,
       })
-      navigate(0)
+      onStatusUpdated?.()
     } catch {
       toast({
         title: 'Status update failed',

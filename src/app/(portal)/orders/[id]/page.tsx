@@ -60,9 +60,13 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<OrderDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     if (!id) return
+
+    setLoading(true)
+    setError(null)
 
     fetch(`/api/orders/${id}`)
       .then((res) => {
@@ -74,7 +78,7 @@ export default function OrderDetailPage() {
         setError(err instanceof Error ? err.message : 'An unexpected error occurred.'),
       )
       .finally(() => setLoading(false))
-  }, [id])
+  }, [id, refreshKey])
 
   if (loading) {
     return <p className="text-muted-foreground">Loading order…</p>
@@ -116,7 +120,12 @@ export default function OrderDetailPage() {
           <Button asChild variant="outline" size="sm">
             <Link to="/orders">Back to orders</Link>
           </Button>
-          <OrderStatusActions orderId={order.id} status={order.status} role={session?.user?.role} />
+          <OrderStatusActions
+            orderId={order.id}
+            status={order.status}
+            role={session?.user?.role}
+            onStatusUpdated={() => setRefreshKey((current) => current + 1)}
+          />
         </div>
       </div>
 
@@ -135,7 +144,7 @@ export default function OrderDetailPage() {
             <TableBody>
               {order.items.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground py-6">
+                  <TableCell colSpan={4} className="py-6 text-center text-muted-foreground">
                     No items found.
                   </TableCell>
                 </TableRow>
