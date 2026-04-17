@@ -50,7 +50,7 @@ export default function AppRouter() {
     }
   }
 
-  route ??= dynamicRoute
+  route = route ?? dynamicRoute
 
   if (!route) {
     return <App />

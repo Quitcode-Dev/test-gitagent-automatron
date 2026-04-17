@@ -64,7 +64,8 @@ export default function RegisterPage() {
       return
     }
 
-    router.push('/login?registered=true')
+    window.sessionStorage.setItem('auth:registered', 'true')
+    router.push('/login')
   }
 
   return (
