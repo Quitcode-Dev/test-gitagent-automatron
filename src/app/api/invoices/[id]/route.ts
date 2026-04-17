@@ -101,7 +101,7 @@ export async function PUT(
 
   const parsed = updateInvoiceSchema.safeParse(body)
   if (!parsed.success) {
-    const message = parsed.error.issues[0]?.message ?? 'Invalid request.'
+    const message = parsed.error.issues[0]?.message ?? 'Validation failed: invalid status value.'
     return new Response(JSON.stringify({ error: message }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },

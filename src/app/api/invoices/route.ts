@@ -14,7 +14,7 @@ const createInvoiceSchema = z.object({
 const MAX_INVOICE_NUMBER_GENERATION_ATTEMPTS = 5
 
 function generateInvoiceNumber(): string {
-  return `INV-${Date.now()}-${randomUUID().split('-')[0]!.toUpperCase()}`
+  return `INV-${Date.now()}-${randomUUID().replaceAll('-', '').toUpperCase()}`
 }
 
 function isInvoiceNumberConflict(error: unknown): boolean {
@@ -98,7 +98,7 @@ export async function POST(request: Request): Promise<Response> {
 
   const parsed = createInvoiceSchema.safeParse(body)
   if (!parsed.success) {
-    const message = parsed.error.issues[0]?.message ?? 'Invalid request.'
+    const message = parsed.error.issues[0]?.message ?? 'Validation failed: invalid invoice input data.'
     return new Response(JSON.stringify({ error: message }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
