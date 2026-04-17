@@ -4,6 +4,14 @@ import { useMemo, useState } from 'react'
 import type { InvoiceStatus, Role } from '@prisma/client'
 
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { INVOICE_STATUS_LABELS } from '@/lib/constants'
 import { useToast } from '@/lib/use-toast'
 
@@ -29,6 +37,7 @@ export function InvoiceStatusActions({
 }: InvoiceStatusActionsProps) {
   const { toast } = useToast()
   const [submittingStatus, setSubmittingStatus] = useState<InvoiceStatus | null>(null)
+  const [pendingStatus, setPendingStatus] = useState<InvoiceStatus | null>(null)
 
   const actions = useMemo<StatusAction[]>(() => {
     if (!role) return []
@@ -56,10 +65,6 @@ export function InvoiceStatusActions({
   }, [role, status])
 
   async function updateStatus(nextStatus: InvoiceStatus) {
-    if (!window.confirm(`Are you sure you want to set this invoice to ${INVOICE_STATUS_LABELS[nextStatus]}?`)) {
-      return
-    }
-
     setSubmittingStatus(nextStatus)
 
     try {
@@ -84,7 +89,8 @@ export function InvoiceStatusActions({
         description: `Invoice status changed to ${INVOICE_STATUS_LABELS[nextStatus]}.`,
       })
       onStatusUpdated?.()
-    } catch {
+    } catch (error) {
+      console.error('Failed to update invoice status:', error)
       toast({
         title: 'Status update failed',
         description: 'An unexpected error occurred.',
@@ -105,12 +111,41 @@ export function InvoiceStatusActions({
           size="sm"
           variant={action.variant}
           className={action.className}
-          onClick={() => updateStatus(action.status)}
+          onClick={() => setPendingStatus(action.status)}
           disabled={submittingStatus !== null}
         >
           {submittingStatus === action.status ? 'Updating…' : action.label}
         </Button>
       ))}
+      <Dialog open={pendingStatus !== null} onOpenChange={(open) => !open && setPendingStatus(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm status change</DialogTitle>
+            <DialogDescription>
+              {pendingStatus
+                ? `Are you sure you want to set this invoice to ${INVOICE_STATUS_LABELS[pendingStatus]}?`
+                : ''}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPendingStatus(null)} disabled={submittingStatus !== null}>
+              Cancel
+            </Button>
+            <Button
+              variant={pendingStatus === 'REJECTED' ? 'destructive' : 'default'}
+              onClick={() => {
+                if (!pendingStatus) return
+                const nextStatus = pendingStatus
+                setPendingStatus(null)
+                void updateStatus(nextStatus)
+              }}
+              disabled={!pendingStatus || submittingStatus !== null}
+            >
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

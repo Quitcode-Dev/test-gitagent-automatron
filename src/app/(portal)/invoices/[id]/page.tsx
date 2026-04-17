@@ -54,7 +54,35 @@ interface InvoiceDetail {
   }
 }
 
-const INVOICE_STATUS_TIMELINE: InvoiceStatus[] = ['DRAFT', 'SUBMITTED', 'APPROVED', 'PAID', 'REJECTED']
+const INVOICE_STATUS_TIMELINE: InvoiceStatus[] = ['DRAFT', 'SUBMITTED', 'APPROVED', 'PAID']
+
+function parseInvoiceDetail(data: unknown): InvoiceDetail {
+  if (
+    !data ||
+    typeof data !== 'object' ||
+    !('id' in data) ||
+    !('invoiceNumber' in data) ||
+    !('status' in data) ||
+    !('totalAmount' in data) ||
+    !('currency' in data) ||
+    !('dueDate' in data) ||
+    !('createdAt' in data) ||
+    !('order' in data) ||
+    typeof data.order !== 'object' ||
+    data.order === null ||
+    !('id' in data.order) ||
+    !('orderNumber' in data.order) ||
+    !('status' in data.order) ||
+    !('totalAmount' in data.order) ||
+    !('currency' in data.order) ||
+    !('items' in data.order) ||
+    !Array.isArray(data.order.items)
+  ) {
+    throw new Error('Invalid invoice data received.')
+  }
+
+  return data as InvoiceDetail
+}
 
 export default function InvoiceDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -75,9 +103,9 @@ export default function InvoiceDetailPage() {
         if (!res.ok) throw new Error(`Failed to load invoice (${res.status})`)
         return res.json()
       })
-      .then((data: InvoiceDetail) => {
+      .then((data: unknown) => {
         if (!isActive) return
-        setInvoice(data)
+        setInvoice(parseInvoiceDetail(data))
         setError(null)
       })
       .catch((err: unknown) => {
@@ -173,6 +201,9 @@ export default function InvoiceDetailPage() {
               {INVOICE_STATUS_LABELS[status]}
             </li>
           ))}
+          {invoice.status === 'REJECTED' && (
+            <li className="font-medium text-destructive">{INVOICE_STATUS_LABELS.REJECTED}</li>
+          )}
         </ol>
       </section>
 
