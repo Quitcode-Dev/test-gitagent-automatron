@@ -46,7 +46,7 @@ export function useRouter() {
     back: () => window.history.back(),
     forward: () => window.history.forward(),
     refresh: () => notifyNavigation(),
-    prefetch: async () => {},
+    prefetch: () => {},
   }
 }
 

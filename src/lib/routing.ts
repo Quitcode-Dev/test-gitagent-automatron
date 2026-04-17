@@ -28,7 +28,7 @@ export function matchRoute(pattern: string, pathname: string): RouteMatch | null
 
   const params: Record<string, string> = {}
 
-  for (let i = 0; i < patternParts.length; i += 1) {
+  for (let i = 0; i < patternParts.length; i++) {
     const patternPart = patternParts[i]
     const pathnamePart = pathnameParts[i]
 
