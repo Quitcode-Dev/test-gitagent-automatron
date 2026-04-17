@@ -1,13 +1,17 @@
-import { Outlet } from 'react-router-dom'
+import type { ReactNode } from 'react'
 
 import { AppShell } from '@/components/layout/AppShell'
 import { Toaster } from '@/components/ui/toaster'
 
-export default function PortalLayout() {
+interface PortalLayoutProps {
+  children: ReactNode
+}
+
+export default function PortalLayout({ children }: PortalLayoutProps) {
   return (
     <Toaster>
       <AppShell>
-        <Outlet />
+        {children}
       </AppShell>
     </Toaster>
   )

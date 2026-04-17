@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -32,7 +33,7 @@ const registerSchema = z
 type RegisterFormValues = z.infer<typeof registerSchema>
 
 export default function RegisterPage() {
-  const navigate = useNavigate()
+  const router = useRouter()
   const [serverError, setServerError] = useState<string | null>(null)
 
   const {
@@ -63,7 +64,7 @@ export default function RegisterPage() {
       return
     }
 
-    navigate('/login', { state: { registered: true } })
+    router.push('/login?registered=true')
   }
 
   return (
@@ -163,7 +164,7 @@ export default function RegisterPage() {
           </Button>
           <p className="text-sm text-muted-foreground">
             Already have an account?{' '}
-            <Link to="/login" className="underline underline-offset-4 hover:text-foreground">
+            <Link href="/login" className="underline underline-offset-4 hover:text-foreground">
               Sign in
             </Link>
           </p>

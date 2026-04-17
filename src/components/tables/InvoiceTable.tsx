@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import type { ComponentProps } from 'react'
 import type { InvoiceStatus } from '@prisma/client'
 
@@ -125,12 +125,12 @@ export function InvoiceTable({ invoices, showSupplierColumn = false }: InvoiceTa
                 return (
                   <TableRow key={invoice.id}>
                     <TableCell className="font-medium">
-                      <Link to={`/invoices/${invoice.id}`} className="hover:underline">
+                      <Link href={`/invoices/${invoice.id}`} className="hover:underline">
                         {invoice.invoiceNumber}
                       </Link>
                     </TableCell>
                     <TableCell>
-                      <Link to={`/orders/${invoice.order.id}`} className="hover:underline">
+                      <Link href={`/orders/${invoice.order.id}`} className="hover:underline">
                         {invoice.order.orderNumber}
                       </Link>
                     </TableCell>
@@ -146,7 +146,7 @@ export function InvoiceTable({ invoices, showSupplierColumn = false }: InvoiceTa
                     <TableCell>{dueDateLabel}</TableCell>
                     <TableCell>
                       <Button asChild variant="ghost" size="sm">
-                        <Link to={`/invoices/${invoice.id}`}>View</Link>
+                        <Link href={`/invoices/${invoice.id}`}>View</Link>
                       </Button>
                     </TableCell>
                   </TableRow>

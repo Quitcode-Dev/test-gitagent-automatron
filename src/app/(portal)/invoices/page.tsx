@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import type { InvoiceStatus } from '@prisma/client'
 import { useSession } from 'next-auth/react'
 
@@ -68,7 +68,7 @@ export default function InvoicesPage() {
           <p className="mt-1 text-muted-foreground">Manage your invoices here.</p>
         </div>
         <Button asChild>
-          <Link to="/invoices/new">Submit Invoice</Link>
+          <Link href="/invoices/new">Submit Invoice</Link>
         </Button>
       </div>
       {loading ? (

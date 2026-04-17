@@ -24,7 +24,9 @@
     /* Path aliases */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "next/link": ["./src/lib/next/link.tsx"],
+      "next/navigation": ["./src/lib/next/navigation.ts"]
     },
     "ignoreDeprecations": "6.0"
   },

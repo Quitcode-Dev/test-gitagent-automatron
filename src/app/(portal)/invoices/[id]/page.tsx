@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import type { ComponentProps } from 'react'
 import type { InvoiceStatus, OrderStatus } from '@prisma/client'
 import { useSession } from 'next-auth/react'
@@ -176,7 +177,7 @@ export default function InvoiceDetailPage() {
       <div className="space-y-4">
         <p className="text-destructive">{error ?? 'Invoice not found.'}</p>
         <Button asChild variant="outline" size="sm">
-          <Link to="/invoices">Back to invoices</Link>
+          <Link href="/invoices">Back to invoices</Link>
         </Button>
       </div>
     )
@@ -212,7 +213,7 @@ export default function InvoiceDetailPage() {
 
         <div className="flex flex-wrap items-center gap-2">
           <Button asChild variant="outline" size="sm">
-            <Link to="/invoices">Back to invoices</Link>
+            <Link href="/invoices">Back to invoices</Link>
           </Button>
           <InvoiceStatusActions
             invoiceId={invoice.id}
@@ -256,7 +257,7 @@ export default function InvoiceDetailPage() {
         <div className="space-y-1 text-sm">
           <p>
             Order:{' '}
-            <Link to={`/orders/${invoice.order.id}`} className="font-medium hover:underline">
+            <Link href={`/orders/${invoice.order.id}`} className="font-medium hover:underline">
               {invoice.order.orderNumber}
             </Link>
           </p>

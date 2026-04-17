@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useFieldArray, useForm, Controller, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -36,7 +36,7 @@ interface SupplierOption {
 }
 
 export default function CreateOrderPage() {
-  const navigate = useNavigate()
+  const router = useRouter()
   const { data: session } = useSession()
   const [suppliers, setSuppliers] = useState<SupplierOption[]>([])
   const [loadError, setLoadError] = useState<string | null>(null)
@@ -117,7 +117,7 @@ export default function CreateOrderPage() {
     }
 
     const data = (await res.json()) as { id: string }
-    navigate(`/orders/${data.id}`)
+    router.push(`/orders/${data.id}`)
   }
 
   return (

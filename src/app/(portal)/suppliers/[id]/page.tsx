@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import type { Supplier } from '@prisma/client'
 import type { ComponentProps } from 'react'
@@ -51,7 +52,7 @@ export default function SupplierDetailPage() {
       <div className="space-y-4">
         <p className="text-destructive">{error ?? 'Supplier not found.'}</p>
         <Button asChild variant="outline" size="sm">
-          <Link to="/suppliers">Back to suppliers</Link>
+          <Link href="/suppliers">Back to suppliers</Link>
         </Button>
       </div>
     )
@@ -74,7 +75,7 @@ export default function SupplierDetailPage() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button asChild variant="outline" size="sm">
-            <Link to="/suppliers">Back to suppliers</Link>
+            <Link href="/suppliers">Back to suppliers</Link>
           </Button>
           {session?.user?.role === 'ADMIN' && (
             <SupplierStatusActions supplier={supplier} onStatusChange={setSupplier} />

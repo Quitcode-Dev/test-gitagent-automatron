@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import type { ComponentProps } from 'react'
 import type { OrderStatus } from '@prisma/client'
 
@@ -134,7 +134,7 @@ export function OrderTable({ orders, showSupplierColumn = false }: OrderTablePro
                     <TableCell>{createdAtLabel}</TableCell>
                     <TableCell>
                       <Button asChild variant="ghost" size="sm">
-                        <Link to={`/orders/${order.id}`}>View</Link>
+                        <Link href={`/orders/${order.id}`}>View</Link>
                       </Button>
                     </TableCell>
                   </TableRow>

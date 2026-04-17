@@ -1,4 +1,5 @@
-import { NavLink } from 'react-router-dom'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 
 import { Button } from '@/components/ui/button'
@@ -11,6 +12,7 @@ interface SidebarNavProps {
 
 export function SidebarNav({ onNavigate }: SidebarNavProps) {
   const { data: session } = useSession()
+  const pathname = usePathname()
   const role = session?.user?.role
   const supplierId = session?.user?.supplierId
 
@@ -25,20 +27,19 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
   return (
     <nav className="flex flex-col gap-1 p-4">
       {visibleItems.map(({ href, label, icon: Icon }) => (
-        <NavLink key={href} to={href} onClick={onNavigate}>
-          {({ isActive }) => (
-            <Button
-              variant="ghost"
-              className={cn(
-                'w-full justify-start gap-2',
-                isActive && 'bg-accent text-accent-foreground'
-              )}
-            >
-              <Icon className="size-4" />
-              {label}
-            </Button>
-          )}
-        </NavLink>
+        <Link key={href} href={href} onClick={onNavigate}>
+          <Button
+            variant="ghost"
+            className={cn(
+              'w-full justify-start gap-2',
+              (pathname === href || pathname.startsWith(`${href}/`)) &&
+                'bg-accent text-accent-foreground',
+            )}
+          >
+            <Icon className="size-4" />
+            {label}
+          </Button>
+        </Link>
       ))}
     </nav>
   )

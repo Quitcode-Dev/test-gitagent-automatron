@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import type { Supplier } from '@prisma/client'
 import type { ComponentProps } from 'react'
 
@@ -95,7 +95,7 @@ export function SupplierTable({ suppliers }: SupplierTableProps) {
                   <TableCell>{formatDate(supplier.createdAt)}</TableCell>
                   <TableCell>
                     <Button asChild variant="ghost" size="sm">
-                      <Link to={`/suppliers/${supplier.id}`}>View</Link>
+                      <Link href={`/suppliers/${supplier.id}`}>View</Link>
                     </Button>
                   </TableCell>
                 </TableRow>

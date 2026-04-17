@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import type { InvoiceStatus, OrderStatus } from '@prisma/client'
 import type { ComponentProps } from 'react'
 import { useSession } from 'next-auth/react'
@@ -89,7 +90,7 @@ export default function OrderDetailPage() {
       <div className="space-y-4">
         <p className="text-destructive">{error ?? 'Order not found.'}</p>
         <Button asChild variant="outline" size="sm">
-          <Link to="/orders">Back to orders</Link>
+          <Link href="/orders">Back to orders</Link>
         </Button>
       </div>
     )
@@ -125,7 +126,7 @@ export default function OrderDetailPage() {
 
         <div className="flex flex-wrap items-center gap-2">
           <Button asChild variant="outline" size="sm">
-            <Link to="/orders">Back to orders</Link>
+            <Link href="/orders">Back to orders</Link>
           </Button>
           <OrderStatusActions
             orderId={order.id}
@@ -186,7 +187,7 @@ export default function OrderDetailPage() {
                 className="flex flex-wrap items-center justify-between gap-3 rounded-md border p-3"
               >
                 <div className="flex items-center gap-2">
-                  <Link to={`/invoices/${invoice.id}`} className="font-medium hover:underline">
+                  <Link href={`/invoices/${invoice.id}`} className="font-medium hover:underline">
                     {invoice.invoiceNumber}
                   </Link>
                   <Badge variant={INVOICE_STATUS_COLORS[invoice.status] as BadgeVariant}>

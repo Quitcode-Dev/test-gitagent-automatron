@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useNavigate, useLocation, Link } from 'react-router-dom'
+import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -25,9 +26,9 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const registered = (location.state as { registered?: boolean } | null)?.registered === true
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const registered = searchParams.get('registered') === 'true'
   const [serverError, setServerError] = useState<string | null>(null)
 
   const {
@@ -51,7 +52,7 @@ export default function LoginPage() {
       return
     }
 
-    navigate('/dashboard')
+    router.push('/dashboard')
   }
 
   return (
@@ -110,7 +111,7 @@ export default function LoginPage() {
           </Button>
           <p className="text-sm text-muted-foreground">
             Don&apos;t have an account?{' '}
-            <Link to="/register" className="underline underline-offset-4 hover:text-foreground">
+            <Link href="/register" className="underline underline-offset-4 hover:text-foreground">
               Register
             </Link>
           </p>

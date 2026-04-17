@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useRouter, useSearchParams } from 'next/navigation'
 import type { OrderStatus } from '@prisma/client'
 import { useForm, Controller, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -51,9 +51,9 @@ const CURRENCY_OPTIONS = ['USD', 'EUR', 'GBP']
 const ORDER_STATUSES: OrderStatus[] = ['CONFIRMED', 'DELIVERED']
 
 export default function CreateInvoicePage() {
-  const navigate = useNavigate()
+  const router = useRouter()
   const { data: session } = useSession()
-  const [searchParams] = useSearchParams()
+  const searchParams = useSearchParams()
   const [orders, setOrders] = useState<OrderOption[]>([])
   const [loadingOrders, setLoadingOrders] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
@@ -144,7 +144,7 @@ export default function CreateInvoicePage() {
     }
 
     const data = (await response.json()) as { id: string }
-    navigate(`/invoices/${data.id}`)
+    router.push(`/invoices/${data.id}`)
   }
 
   return (
