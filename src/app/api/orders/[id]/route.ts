@@ -1,14 +1,26 @@
-import { OrderStatus } from '@prisma/client'
+import { OrderStatus, Role } from '@prisma/client'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth-utils'
 
-const updatableStatusesByCurrent: Record<OrderStatus, OrderStatus[]> = {
+const adminUpdatableStatusesByCurrent: Record<OrderStatus, OrderStatus[]> = {
   DRAFT: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
-  CONFIRMED: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
-  SHIPPED: [OrderStatus.DELIVERED],
+  CONFIRMED: [OrderStatus.CANCELLED],
+  SHIPPED: [OrderStatus.DELIVERED, OrderStatus.CANCELLED],
+  DELIVERED: [OrderStatus.CANCELLED],
+  CANCELLED: [],
+}
+
+const supplierUpdatableStatusesByCurrent: Record<OrderStatus, OrderStatus[]> = {
+  DRAFT: [],
+  CONFIRMED: [OrderStatus.SHIPPED],
+  SHIPPED: [],
   DELIVERED: [],
   CANCELLED: [],
+}
+
+function getUpdatableStatusesByCurrent(role: Role): Record<OrderStatus, OrderStatus[]> {
+  return role === 'ADMIN' ? adminUpdatableStatusesByCurrent : supplierUpdatableStatusesByCurrent
 }
 
 const updateOrderSchema = z
@@ -129,10 +141,10 @@ export async function PUT(
   const { status, items } = parsed.data
 
   if (status && status !== existingOrder.status) {
-    const allowedTransitions = updatableStatusesByCurrent[existingOrder.status]
+    const allowedTransitions = getUpdatableStatusesByCurrent(user.role)[existingOrder.status]
     if (!allowedTransitions.includes(status)) {
-      return new Response(JSON.stringify({ error: 'Invalid status transition.' }), {
-        status: 400,
+      return new Response(JSON.stringify({ error: 'Forbidden status transition.' }), {
+        status: 403,
         headers: { 'Content-Type': 'application/json' },
       })
     }
