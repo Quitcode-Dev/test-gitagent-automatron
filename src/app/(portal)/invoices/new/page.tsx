@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { OrderStatus } from '@prisma/client'
 import { useForm, Controller, useWatch } from 'react-hook-form'
@@ -49,8 +49,9 @@ interface OrderOption {
 
 const CURRENCY_OPTIONS = ['USD', 'EUR', 'GBP']
 const ORDER_STATUSES: OrderStatus[] = ['CONFIRMED', 'DELIVERED']
+export const dynamic = 'force-dynamic'
 
-export default function CreateInvoicePage() {
+function CreateInvoicePageContent() {
   const router = useRouter()
   const { data: session } = useSession()
   const searchParams = useSearchParams()
@@ -288,5 +289,13 @@ export default function CreateInvoicePage() {
         </CardContent>
       </form>
     </Card>
+  )
+}
+
+export default function CreateInvoicePage() {
+  return (
+    <Suspense fallback={null}>
+      <CreateInvoicePageContent />
+    </Suspense>
   )
 }

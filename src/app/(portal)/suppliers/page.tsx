@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useState } from 'react'
 import type { Supplier } from '@prisma/client'
 
@@ -35,4 +37,3 @@ export default function SuppliersPage() {
     </div>
   )
 }
-
