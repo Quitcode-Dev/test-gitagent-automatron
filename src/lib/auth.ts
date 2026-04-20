@@ -69,7 +69,7 @@ export const authOptions: NextAuthOptions = {
       const authUrl = process.env.NEXTAUTH_URL ?? baseUrl;
       const authOrigin = new URL(authUrl).origin;
 
-      if (url.startsWith("/")) {
+      if (url.startsWith("/") && !url.startsWith("//")) {
         return `${authOrigin}${url}`;
       }
 
