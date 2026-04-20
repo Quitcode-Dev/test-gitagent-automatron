@@ -67,12 +67,18 @@ export const authOptions: NextAuthOptions = {
     },
     async redirect({ url, baseUrl }) {
       const authUrl = process.env.NEXTAUTH_URL ?? baseUrl;
+      const authOrigin = new URL(authUrl).origin;
 
       if (url.startsWith("/")) {
-        return `${authUrl}${url}`;
+        return `${authOrigin}${url}`;
       }
 
-      return url.startsWith(authUrl) ? url : authUrl;
+      try {
+        const redirectUrl = new URL(url);
+        return redirectUrl.origin === authOrigin ? redirectUrl.toString() : authOrigin;
+      } catch {
+        return authOrigin;
+      }
     },
   },
 };
