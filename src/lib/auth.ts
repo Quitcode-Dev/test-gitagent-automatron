@@ -5,6 +5,7 @@ import { type Role } from "@prisma/client";
 import { prisma } from "./prisma";
 
 export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
   },
@@ -63,6 +64,15 @@ export const authOptions: NextAuthOptions = {
         session.user.supplierId = token.supplierId;
       }
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+      const authUrl = process.env.NEXTAUTH_URL ?? baseUrl;
+
+      if (url.startsWith("/")) {
+        return `${authUrl}${url}`;
+      }
+
+      return url.startsWith(authUrl) ? url : authUrl;
     },
   },
 };

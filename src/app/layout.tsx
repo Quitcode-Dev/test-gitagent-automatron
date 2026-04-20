@@ -1,13 +1,17 @@
-'use client'
-
 import type { ReactNode } from 'react'
-import { SessionProvider } from 'next-auth/react'
 import '../index.css'
+import { Providers } from './providers'
 
 interface AppLayoutProps {
   children: ReactNode
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  return <SessionProvider>{children}</SessionProvider>
+  return (
+    <html lang="en">
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  )
 }
